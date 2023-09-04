@@ -1,8 +1,10 @@
 package com.example.giphy.domain.repository
 
-import com.example.giphy.data.remote.dto.GiphyDTO
+import com.example.giphy.common.Resource
+import com.example.giphy.domain.model.Giphy
+import kotlinx.coroutines.flow.Flow
 
 interface GiphyRepository {
 
-    suspend fun getTrendingGifs(): GiphyDTO
+    fun getTrendingGifs(): Flow<Resource<List<Giphy>>>
 }

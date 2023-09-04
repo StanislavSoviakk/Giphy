@@ -14,7 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 class GifsListViewModel @Inject constructor(
     private val getTrendingGifsUseCase: GetTrendingGifsUseCase
-): ViewModel(){
+) : ViewModel() {
     private val _state = mutableStateOf(GifsListState())
     val state: State<GifsListState> = _state
 
@@ -22,15 +22,18 @@ class GifsListViewModel @Inject constructor(
         getGifs()
     }
 
-    private fun getGifs(){
-        getTrendingGifsUseCase().onEach {result ->
+    private fun getGifs() {
+        getTrendingGifsUseCase().onEach { result ->
             when (result) {
                 is Resource.Success -> {
                     _state.value = GifsListState(gifs = result.data ?: emptyList())
                 }
+
                 is Resource.Error -> {
-                    _state.value = GifsListState(error = result.message ?: "An unexpected error occured")
+                    _state.value =
+                        GifsListState(error = result.message ?: "An unexpected error occured")
                 }
+
                 is Resource.Loading -> {
                     _state.value = GifsListState(isLoading = true)
                 }
