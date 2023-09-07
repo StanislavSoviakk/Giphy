@@ -7,4 +7,6 @@ import kotlinx.coroutines.flow.Flow
 interface GiphyRepository {
 
     fun getTrendingGifs(): Flow<Resource<List<Giphy>>>
+
+    fun getGifs(query: String): Flow<Resource<List<Giphy>>>
 }

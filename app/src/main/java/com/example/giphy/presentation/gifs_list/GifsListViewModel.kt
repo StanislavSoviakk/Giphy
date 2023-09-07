@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.giphy.common.Resource
+import com.example.giphy.domain.use_case.GetGifUseCase
 import com.example.giphy.domain.use_case.GetTrendingGifsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
@@ -13,16 +14,37 @@ import javax.inject.Inject
 
 @HiltViewModel
 class GifsListViewModel @Inject constructor(
-    private val getTrendingGifsUseCase: GetTrendingGifsUseCase
+    private val getTrendingGifsUseCase: GetTrendingGifsUseCase,
+    private val getGifUseCase: GetGifUseCase
 ) : ViewModel() {
     private val _state = mutableStateOf(GifsListState())
     val state: State<GifsListState> = _state
 
     init {
-        getGifs()
+        getTrendingGifs()
     }
 
-    private fun getGifs() {
+    fun getGifs(gifName:String){
+        getGifUseCase(gifName).onEach {
+                result ->
+            when (result) {
+                is Resource.Success -> {
+                    _state.value = GifsListState(gifs = result.data ?: emptyList())
+                }
+
+                is Resource.Error -> {
+                    _state.value =
+                        GifsListState(error = result.message ?: "An unexpected error occured")
+                }
+
+                is Resource.Loading -> {
+                    _state.value = GifsListState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    private fun getTrendingGifs() {
         getTrendingGifsUseCase().onEach { result ->
             when (result) {
                 is Resource.Success -> {

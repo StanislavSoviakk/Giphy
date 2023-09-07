@@ -3,6 +3,7 @@ package com.example.giphy.presentation.gifs_list
 import android.os.Build.VERSION.SDK_INT
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,13 +12,21 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,13 +43,20 @@ import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import com.example.giphy.domain.model.Giphy
 import com.example.giphy.presentation.Screen
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.KeyboardType
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun GifsListScreen(
     navController: NavController,
     viewModel: GifsListViewModel = hiltViewModel()
 ) {
     val state = viewModel.state.value
+    var searchText by remember { mutableStateOf("") }
 
     val imageLoader = ImageLoader.Builder(LocalContext.current)
         .components {
@@ -56,7 +72,30 @@ fun GifsListScreen(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        GifsList(gifs = state.gifs, imageLoader = imageLoader, navController)
+        Column {
+            val keyboardController = LocalSoftwareKeyboardController.current
+            TextField(
+                value = searchText,
+                onValueChange = {
+                    searchText = it
+                },
+                singleLine = true,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                placeholder = { Text(text = "Search") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                trailingIcon = {
+                    IconButton(onClick = {
+                        viewModel.getGifs(searchText)
+                        keyboardController?.hide()
+                    }) {
+                        Icon(imageVector = Icons.Filled.Search, contentDescription = "Search")
+                    }
+                }
+            )
+            GifsList(gifs = state.gifs, imageLoader = imageLoader, navController)
+        }
         if (state.error.isNotBlank()) {
             Text(
                 text = state.error,
@@ -95,7 +134,7 @@ private fun GifsList(
 }
 
 @Composable
-fun Int.pxToDp() = with(LocalDensity.current) { this@pxToDp.toDp()}
+fun Int.pxToDp() = with(LocalDensity.current) { this@pxToDp.toDp() }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
