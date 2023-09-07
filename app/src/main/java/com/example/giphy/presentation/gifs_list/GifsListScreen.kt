@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
@@ -22,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -74,7 +76,11 @@ fun GifsListScreen(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun GifsList(gifs: List<Giphy>, imageLoader: ImageLoader, navController: NavController) {
+private fun GifsList(
+    gifs: List<Giphy>,
+    imageLoader: ImageLoader,
+    navController: NavController,
+) {
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(2),
         modifier = Modifier.fillMaxSize(),
@@ -88,12 +94,16 @@ private fun GifsList(gifs: List<Giphy>, imageLoader: ImageLoader, navController:
     }
 }
 
+@Composable
+fun Int.pxToDp() = with(LocalDensity.current) { this@pxToDp.toDp()}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun GifView(gif: Giphy, imageLoader: ImageLoader, onItemClick: () -> Unit) {
+
     Card(
         modifier = Modifier
-            .fillMaxWidth()
+            .size(width = gif.width.pxToDp(), height = gif.height.pxToDp())
             .padding(horizontal = 4.dp, vertical = 4.dp),
         shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
