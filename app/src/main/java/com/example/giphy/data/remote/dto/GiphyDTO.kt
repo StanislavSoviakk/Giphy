@@ -306,6 +306,8 @@ fun GiphyDTO.Data.toGiphy(): Giphy {
     return Giphy(
         id = id,
         title = title,
-        url = images.original.url
+        url = images.original.url,
+        height = images.original.height.toInt(),
+        width = images.original.width.toInt()
     )
 }

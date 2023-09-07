@@ -17,7 +17,23 @@ class GiphyRepositoryImpl @Inject constructor(
     override fun getTrendingGifs(): Flow<Resource<List<Giphy>>> = flow {
         try {
             emit(Resource.Loading<List<Giphy>>())
-            val gifs = api.getGifs().data.map { it.toGiphy() }
+            val gifs = api.getTrendingGifs().data.map { it.toGiphy() }
+            emit(Resource.Success<List<Giphy>>(gifs))
+        } catch (e: HttpException) {
+            emit(Resource.Error<List<Giphy>>(e.localizedMessage ?: "An unexpected error occurred"))
+        } catch (e: IOException) {
+            emit(
+                Resource.Error(
+                    e.localizedMessage ?: "Couldn't reach server. Check your internet connection"
+                )
+            )
+        }
+    }
+
+    override fun getGifs(query: String): Flow<Resource<List<Giphy>>> = flow {
+        try {
+            emit(Resource.Loading<List<Giphy>>())
+            val gifs = api.getGifs(query = query).data.map { it.toGiphy() }
             emit(Resource.Success<List<Giphy>>(gifs))
         } catch (e: HttpException) {
             emit(Resource.Error<List<Giphy>>(e.localizedMessage ?: "An unexpected error occurred"))
