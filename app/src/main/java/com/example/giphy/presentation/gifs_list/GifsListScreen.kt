@@ -87,7 +87,13 @@ fun GifsListScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                 trailingIcon = {
                     IconButton(onClick = {
-                        viewModel.getGifs(searchText)
+                        if (searchText.isNullOrBlank()){
+                            //If there are no search query, load trending gifs
+                            viewModel.getTrendingGifs()
+                        } else {
+                            //If there are search query, load searched gifs
+                            viewModel.getGifs(searchText)
+                        }
                         keyboardController?.hide()
                     }) {
                         Icon(imageVector = Icons.Filled.Search, contentDescription = "Search")
