@@ -44,7 +44,7 @@ class GifsListViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    private fun getTrendingGifs() {
+    fun getTrendingGifs() {
         getTrendingGifsUseCase().onEach { result ->
             when (result) {
                 is Resource.Success -> {
